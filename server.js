@@ -28,6 +28,12 @@ app.get('/list', (req, res) => {
     res.json(pngFiles);
 });
 
+// Set cache-control headers to instruct the browser not to cache
+app.use((req, res, next) => {
+    res.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    next();
+});
+
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
