@@ -22,9 +22,9 @@
         const imageDisplay = document.getElementById('imageDisplay');
 
         async function listFiles() {
-            const repoOwner = 'shannonbaker';
-            const repoName = 'aaa';
-            const directoryPath = 'font_files';
+            const repoOwner = 'owner'; // Replace with your GitHub username or organization
+            const repoName = 'repo';   // Replace with your GitHub repository name
+            const directoryPath = 'font_files'; // Replace with the directory containing your PNG files
 
             const files = await listFilesRecursively(repoOwner, repoName, directoryPath);
 
@@ -35,8 +35,11 @@
                     // Fetch image dimensions
                     const dimensions = await getImageDimensions(file.download_url);
 
+                    // Get the path to the parent folder
+                    const parentFolderPath = file.path.substring(0, file.path.lastIndexOf('/'));
+
                     // Fetch and parse dpfont.json for the identifier
-                    const identifier = await getIdentifierFromJSON(repoOwner, repoName, file.path);
+                    const identifier = await getIdentifierFromJSON(repoOwner, repoName, parentFolderPath);
 
                     // Create the 'File' cell
                     const fileLinkCell = document.createElement('td');
@@ -103,8 +106,8 @@
             });
         }
 
-        async function getIdentifierFromJSON(owner, repo, filePath) {
-            const dpfontJsonUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${filePath}/dpfont.json`;
+        async function getIdentifierFromJSON(owner, repo, path) {
+            const dpfontJsonUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${path}/dpfont.json`;
 
             try {
                 const response = await fetch(dpfontJsonUrl);
