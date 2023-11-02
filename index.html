@@ -4,11 +4,13 @@
     <title>Font Files</title>
 </head>
 <body>
+    <div id="lastUpdated">Last Updated: <span id="updateTime"></span></div>
     <h1>Font Files</h1>
     <ul id="fileList"></ul>
     <div id="imageDisplay"></div>
 
     <script>
+        const lastUpdated = document.getElementById('updateTime');
         const fileList = document.getElementById('fileList');
         const imageDisplay = document.getElementById('imageDisplay');
 
@@ -35,7 +37,16 @@
             imageDisplay.innerHTML = `<img src="${imageUrl}" alt="Font Image" />`;
         }
 
+        function fetchUpdateTime() {
+            fetch('/index.html')
+                .then(response => response.headers.get('last-modified'))
+                .then(date => {
+                    lastUpdated.textContent = 'Last Updated: ' + new Date(date).toLocaleString();
+                });
+        }
+
         listFiles();
+        fetchUpdateTime();
     </script>
 </body>
 </html>
