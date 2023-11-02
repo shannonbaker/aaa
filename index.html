@@ -104,7 +104,7 @@
         }
 
         async function getIdentifierFromJSON(owner, repo, filePath) {
-            const dpfontJsonUrl = `https://raw.githubusercontent.com/${owner}/${repo}/master/${filePath}/dpfont.json`;
+            const dpfontJsonUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${filePath}/dpfont.json`;
 
             try {
                 const response = await fetch(dpfontJsonUrl);
