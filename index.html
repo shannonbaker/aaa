@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Font Files.</title>
+    <title>Font Files</title>
 </head>
 <body>
     <h1>Font Files</h1>
@@ -10,6 +10,7 @@
             <tr>
                 <th>File</th>
                 <th>Dimensions</th>
+                <th>Identifier</th>
             </tr>
         </thead>
         <tbody id="fileList"></tbody>
@@ -27,32 +28,44 @@
 
             const files = await listFilesRecursively(repoOwner, repoName, directoryPath);
 
-            files.forEach(file => {
-                getImageDimensions(file.download_url)
-                    .then(dimensions => {
-                        if (file.name.endsWith('36.png')) {
-                            const row = document.createElement('tr');
+            for (const file of files) {
+                if (file.name.endsWith('36.png')) {
+                    const row = document.createElement('tr');
 
-                            const fileLinkCell = document.createElement('td');
-                            const fileLink = document.createElement('a');
-                            fileLink.href = file.download_url;
-                            fileLink.textContent = file.name;
-                            fileLink.addEventListener('click', (e) => {
-                                e.preventDefault();
-                                displayImage(file.download_url);
-                            });
-                            fileLinkCell.appendChild(fileLink);
+                    // Fetch image dimensions
+                    const dimensions = await getImageDimensions(file.download_url);
 
-                            const dimensionsCell = document.createElement('td');
-                            dimensionsCell.textContent = `${dimensions.width}x${dimensions.height}`;
+                    // Fetch and parse dpfont.json for the identifier
+                    const identifier = await getIdentifierFromJSON(repoOwner, repoName, file.path);
 
-                            row.appendChild(fileLinkCell);
-                            row.appendChild(dimensionsCell);
-
-                            fileList.appendChild(row);
-                        }
+                    // Create the 'File' cell
+                    const fileLinkCell = document.createElement('td');
+                    const fileLink = document.createElement('a');
+                    fileLink.href = file.download_url;
+                    fileLink.textContent = file.name;
+                    fileLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        displayImage(file.download_url);
                     });
-            });
+                    fileLinkCell.appendChild(fileLink);
+
+                    // Create the 'Dimensions' cell
+                    const dimensionsCell = document.createElement('td');
+                    dimensionsCell.textContent = `${dimensions.width}x${dimensions.height}`;
+
+                    // Create the 'Identifier' cell
+                    const identifierCell = document.createElement('td');
+                    identifierCell.textContent = identifier;
+
+                    // Add cells to the row
+                    row.appendChild(fileLinkCell);
+                    row.appendChild(dimensionsCell);
+                    row.appendChild(identifierCell);
+
+                    // Add the row to the table
+                    fileList.appendChild(row);
+                }
+            }
         }
 
         async function listFilesRecursively(owner, repo, path) {
@@ -85,9 +98,26 @@
                 };
 
                 img.onerror = function () {
-                    reject(new Error('Failed to load image'));
+                    reject(new Error('Failed to load image dimensions'));
                 };
             });
+        }
+
+        async function getIdentifierFromJSON(owner, repo, filePath) {
+            const dpfontJsonUrl = `https://raw.githubusercontent.com/${owner}/${repo}/master/${filePath}/dpfont.json`;
+
+            try {
+                const response = await fetch(dpfontJsonUrl);
+                const data = await response.json();
+
+                if (data && data.identifier) {
+                    return data.identifier;
+                } else {
+                    return 'N/A';
+                }
+            } catch (error) {
+                return 'N/A';
+            }
         }
 
         function displayImage(imageUrl) {
