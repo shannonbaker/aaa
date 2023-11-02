@@ -17,23 +17,37 @@
             const repoName = 'aaa';
             const directoryPath = 'font_files';
 
-            const response = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${directoryPath}`);
+            const files = await listFilesRecursively(repoOwner, repoName, directoryPath);
+
+            files.forEach(file => {
+                const listItem = document.createElement('li');
+                const fileLink = document.createElement('a');
+                fileLink.href = file.download_url;
+                fileLink.textContent = file.name;
+                fileLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    displayImage(file.download_url);
+                });
+                listItem.appendChild(fileLink);
+                fileList.appendChild(listItem);
+            });
+        }
+
+        async function listFilesRecursively(owner, repo, path) {
+            const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`);
             const data = await response.json();
+            let files = [];
 
             for (const item of data) {
                 if (item.type === 'file' && item.name.endsWith('.png')) {
-                    const listItem = document.createElement('li');
-                    const fileLink = document.createElement('a');
-                    fileLink.href = item.download_url;
-                    fileLink.textContent = item.name;
-                    fileLink.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        displayImage(item.download_url);
-                    });
-                    listItem.appendChild(fileLink);
-                    fileList.appendChild(listItem);
+                    files.push(item);
+                } else if (item.type === 'dir') {
+                    const subFiles = await listFilesRecursively(owner, repo, item.path);
+                    files = files.concat(subFiles);
                 }
             }
+
+            return files;
         }
 
         function displayImage(imageUrl) {
