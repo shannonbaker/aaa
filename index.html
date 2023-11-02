@@ -5,45 +5,38 @@
 </head>
 <body>
     <h1>Font Files</h1>
-    <ul id="fileList."></ul>
+    <ul id="fileList"></ul>
     <div id="imageDisplay"></div>
-    <div id="randomNumber">Random Number: <span id="randomValue"></span></div>
 
     <script>
         const fileList = document.getElementById('fileList');
         const imageDisplay = document.getElementById('imageDisplay');
-        const randomNumber = document.getElementById('randomValue');
-
-        function generateRandomNumber(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
 
         function listFiles() {
-            fetch('/list')
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(file => {
-                        const listItem = document.createElement('li');
-                        const fileLink = document.createElement('a');
-                        fileLink.href = file;
-                        fileLink.textContent = file.split('/').pop();
-                        fileLink.addEventListener('click', (e) => {
-                            e.preventDefault();
-                            displayImage(file);
-                        });
-                        listItem.appendChild(fileLink);
-                        fileList.appendChild(listItem);
-                    });
+            // Replace with your font file URLs on GitHub Pages
+            const fontFileURLs = [
+                'https://username.github.io/repo/font_files/font1.png',
+                'https://username.github.io/repo/font_files/font2.png',
+                // Add more file URLs as needed
+            ];
+
+            fontFileURLs.forEach(fileURL => {
+                const listItem = document.createElement('li');
+                const fileLink = document.createElement('a');
+                fileLink.href = fileURL;
+                fileLink.textContent = fileURL.split('/').pop();
+                fileLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    displayImage(fileURL);
                 });
+                listItem.appendChild(fileLink);
+                fileList.appendChild(listItem);
+            });
         }
 
         function displayImage(imageUrl) {
             imageDisplay.innerHTML = `<img src="${imageUrl}" alt="Font Image" />`;
         }
-
-        // Generate and display a random number
-        const randomValue = generateRandomNumber(1, 1000);
-        randomNumber.textContent = 'Random Number: ' + randomValue;
 
         listFiles();
     </script>
