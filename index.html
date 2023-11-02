@@ -4,15 +4,15 @@
     <title>Font Files</title>
 </head>
 <body>
-    <div id="randomNumber">Random Number: <span id="randomValue"></span></div>
     <h1>Font Files</h1>
     <ul id="fileList"></ul>
     <div id="imageDisplay"></div>
+    <div id="randomNumber">Random Number: <span id="randomValue"></span></div>
 
     <script>
-        const randomNumber = document.getElementById('randomValue');
         const fileList = document.getElementById('fileList');
         const imageDisplay = document.getElementById('imageDisplay');
+        const randomNumber = document.getElementById('randomValue');
 
         function generateRandomNumber(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
