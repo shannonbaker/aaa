@@ -1,0 +1,17 @@
+{
+    "name": "Blinder",
+    "version": "1.0.0",
+    "author": "Shannon Baker <email@example.com>",
+    "license": "ISC",
+    "homepage": "https://www.buymeacoffee.com/SNEAKYFPV",
+    "supports": [
+        {
+            "identifier": "ARDU",
+            "min_version": "4.0",
+            "files": {
+                "24x36": ["WS_ARDU_Blinder_24.png"],
+                "36x54": ["WS_ARDU_Blinder_36.png"]
+            }
+        }        
+    ]
+}
