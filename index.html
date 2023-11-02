@@ -2,18 +2,25 @@
 <html>
 <head>
     <title>Font Files</title>
+    <style>
+        .file-list {
+            list-style: none;
+        }
+    </style>
 </head>
 <body>
     <h1>Font Files</h1>
-    <ul id="fileList"></ul>
+    <ul class="file-list" id="fileList"></ul>
+    <div id="imageDisplay"></div>
 
     <script>
-        // Function to fetch and display a list of files in the "font_files" directory
-        function listFontFiles() {
-            const fileList = document.getElementById('fileList');
-            const directory = 'font_files';
+        const fileList = document.getElementById('fileList');
+        const imageDisplay = document.getElementById('imageDisplay');
+        const directory = 'font_files';
 
-            fetch(directory)
+        // Function to fetch and display a list of PNG files recursively
+        function listFontFiles(dir) {
+            fetch(dir)
                 .then(response => response.text())
                 .then(data => {
                     const parser = new DOMParser();
@@ -21,17 +28,32 @@
                     const links = htmlDocument.querySelectorAll('a');
 
                     links.forEach(link => {
-                        const listItem = document.createElement('li');
-                        const fileLink = document.createElement('a');
-                        fileLink.href = directory + '/' + link.textContent;
-                        fileLink.textContent = link.textContent;
-                        listItem.appendChild(fileLink);
-                        fileList.appendChild(listItem);
+                        const fileName = link.textContent;
+                        if (fileName.endsWith('.png')) {
+                            const listItem = document.createElement('li');
+                            const fileLink = document.createElement('a');
+                            fileLink.href = dir + '/' + fileName;
+                            fileLink.textContent = fileName;
+                            fileLink.addEventListener('click', function (e) {
+                                e.preventDefault();
+                                displayImage(fileLink.href);
+                            });
+                            listItem.appendChild(fileLink);
+                            fileList.appendChild(listItem);
+                        }
+                        if (fileName.endsWith('/')) {
+                            // It's a subdirectory; list its files
+                            listFontFiles(dir + '/' + fileName);
+                        }
                     });
                 });
         }
 
-        listFontFiles();
+        function displayImage(imageUrl) {
+            imageDisplay.innerHTML = `<img src="${imageUrl}" alt="Font Image" />`;
+        }
+
+        listFontFiles(directory);
     </script>
 </body>
 </html>
