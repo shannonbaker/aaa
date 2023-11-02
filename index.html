@@ -4,15 +4,19 @@
     <title>Font Files</title>
 </head>
 <body>
-    <div id="lastUpdated">Last Updated: <span id="updateTime"></span></div>
-    <h1>Font File.s</h1>
+    <div id="randomNumber">Random Number: <span id="randomValue"></span></div>
+    <h1>Font Files</h1>
     <ul id="fileList"></ul>
     <div id="imageDisplay"></div>
 
     <script>
-        const lastUpdated = document.getElementById('updateTime');
+        const randomNumber = document.getElementById('randomValue');
         const fileList = document.getElementById('fileList');
         const imageDisplay = document.getElementById('imageDisplay');
+
+        function generateRandomNumber(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
 
         function listFiles() {
             fetch('/list')
@@ -37,16 +41,11 @@
             imageDisplay.innerHTML = `<img src="${imageUrl}" alt="Font Image" />`;
         }
 
-        function fetchUpdateTime() {
-            fetch('/index.html')
-                .then(response => response.headers.get('last-modified'))
-                .then(date => {
-                    lastUpdated.textContent = 'Last Updated: ' + new Date(date).toLocaleString();
-                });
-        }
+        // Generate and display a random number
+        const randomValue = generateRandomNumber(1, 1000);
+        randomNumber.textContent = 'Random Number: ' + randomValue;
 
         listFiles();
-        fetchUpdateTime();
     </script>
 </body>
 </html>
