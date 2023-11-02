@@ -9,24 +9,22 @@ const rootDirectory = path.join(__dirname, 'font_files');
 app.use(express.static(rootDirectory));
 
 app.get('/list', (req, res) => {
-    // List PNG files recursively and send the list as JSON
-    function listPNGFiles(directory) {
+    function listPNGFiles(directory, filesList) {
         const files = fs.readdirSync(directory);
-        const fileList = [];
 
         files.forEach((file) => {
             const filePath = path.join(directory, file);
+
             if (fs.statSync(filePath).isDirectory()) {
-                fileList.push(...listPNGFiles(filePath));
+                listPNGFiles(filePath, filesList);
             } else if (file.endsWith('.png')) {
-                fileList.push(filePath.replace(rootDirectory, ''));
+                filesList.push(filePath);
             }
         });
-
-        return fileList;
     }
 
-    const pngFiles = listPNGFiles(rootDirectory);
+    const pngFiles = [];
+    listPNGFiles(rootDirectory, pngFiles);
     res.json(pngFiles);
 });
 
