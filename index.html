@@ -15,7 +15,7 @@
         async function listFiles() {
             const repoOwner = 'shannonbaker';
             const repoName = 'aaa';
-            const directoryPath = 'font_files';
+            const directoryPath = 'font_files/INAV_Batman';
 
             const response = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${directoryPath}`);
             const data = await response.json();
