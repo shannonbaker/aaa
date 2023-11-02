@@ -2,49 +2,31 @@
 <html>
 <head>
     <title>Font Files</title>
-    <style>
-        .file-list {
-            list-style: none;
-        }
-    </style>
 </head>
 <body>
     <h1>Font Files</h1>
-    <ul class="file-list" id="fileList"></ul>
+    <ul id="fileList"></ul>
     <div id="imageDisplay"></div>
 
     <script>
         const fileList = document.getElementById('fileList');
         const imageDisplay = document.getElementById('imageDisplay');
-        const directory = 'font_files';
 
-        // Function to fetch and display a list of PNG files recursively
-        function listFontFiles(dir) {
-            fetch(dir)
-                .then(response => response.text())
+        function listFiles() {
+            fetch('/list')
+                .then(response => response.json())
                 .then(data => {
-                    const parser = new DOMParser();
-                    const htmlDocument = parser.parseFromString(data, 'text/html');
-                    const links = htmlDocument.querySelectorAll('a');
-
-                    links.forEach(link => {
-                        const fileName = link.textContent;
-                        if (fileName.endsWith('.png')) {
-                            const listItem = document.createElement('li');
-                            const fileLink = document.createElement('a');
-                            fileLink.href = dir + '/' + fileName;
-                            fileLink.textContent = fileName;
-                            fileLink.addEventListener('click', function (e) {
-                                e.preventDefault();
-                                displayImage(fileLink.href);
-                            });
-                            listItem.appendChild(fileLink);
-                            fileList.appendChild(listItem);
-                        }
-                        if (fileName.endsWith('/')) {
-                            // It's a subdirectory; list its files
-                            listFontFiles(dir + '/' + fileName);
-                        }
+                    data.forEach(file => {
+                        const listItem = document.createElement('li');
+                        const fileLink = document.createElement('a');
+                        fileLink.href = file;
+                        fileLink.textContent = file.split('/').pop();
+                        fileLink.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            displayImage(file);
+                        });
+                        listItem.appendChild(fileLink);
+                        fileList.appendChild(listItem);
                     });
                 });
         }
@@ -53,7 +35,7 @@
             imageDisplay.innerHTML = `<img src="${imageUrl}" alt="Font Image" />`;
         }
 
-        listFontFiles(directory);
+        listFiles();
     </script>
 </body>
 </html>
