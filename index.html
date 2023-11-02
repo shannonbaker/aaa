@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Font Files</title>
+</head>
+<body>
+    <h1>Font Files</h1>
+    <ul id="fileList"></ul>
+
+    <script>
+        // Function to fetch and display a list of files in the "font_files" directory
+        function listFontFiles() {
+            const fileList = document.getElementById('fileList');
+            const directory = 'font_files';
+
+            fetch(directory)
+                .then(response => response.text())
+                .then(data => {
+                    const parser = new DOMParser();
+                    const htmlDocument = parser.parseFromString(data, 'text/html');
+                    const links = htmlDocument.querySelectorAll('a');
+
+                    links.forEach(link => {
+                        const listItem = document.createElement('li');
+                        const fileLink = document.createElement('a');
+                        fileLink.href = directory + '/' + link.textContent;
+                        fileLink.textContent = link.textContent;
+                        listItem.appendChild(fileLink);
+                        fileList.appendChild(listItem);
+                    });
+                });
+        }
+
+        listFontFiles();
+    </script>
+</body>
+</html>
