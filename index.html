@@ -30,7 +30,7 @@
             files.forEach(file => {
                 getImageDimensions(file.download_url)
                     .then(dimensions => {
-                        if (dimensions.width === 36 && file.name.endsWith('.png')) {
+                        if (file.name.endsWith('36.png')) {
                             const row = document.createElement('tr');
 
                             const fileLinkCell = document.createElement('td');
