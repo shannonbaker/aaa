@@ -12,26 +12,28 @@
         const fileList = document.getElementById('fileList');
         const imageDisplay = document.getElementById('imageDisplay');
 
-        function listFiles() {
-            // Replace with your font file URLs on GitHub Pages
-            const fontFileURLs = [
-                'https://username.github.io/repo/font_files/font1.png',
-                'https://username.github.io/repo/font_files/font2.png',
-                // Add more file URLs as needed
-            ];
+        async function listFiles() {
+            const repoOwner = 'shannonbaker';
+            const repoName = 'aaa';
+            const directoryPath = 'font_files';
 
-            fontFileURLs.forEach(fileURL => {
-                const listItem = document.createElement('li');
-                const fileLink = document.createElement('a');
-                fileLink.href = fileURL;
-                fileLink.textContent = fileURL.split('/').pop();
-                fileLink.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    displayImage(fileURL);
-                });
-                listItem.appendChild(fileLink);
-                fileList.appendChild(listItem);
-            });
+            const response = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${directoryPath}`);
+            const data = await response.json();
+
+            for (const item of data) {
+                if (item.type === 'file' && item.name.endsWith('.png')) {
+                    const listItem = document.createElement('li');
+                    const fileLink = document.createElement('a');
+                    fileLink.href = item.download_url;
+                    fileLink.textContent = item.name;
+                    fileLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        displayImage(item.download_url);
+                    });
+                    listItem.appendChild(fileLink);
+                    fileList.appendChild(listItem);
+                }
+            }
         }
 
         function displayImage(imageUrl) {
