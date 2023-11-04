@@ -6,11 +6,17 @@
 </head>
 <body>
     <input type="file" id="imageInput" accept="image/*">
+    <input type="file" id="replacementInput" accept="image/*">
     <canvas id="canvas" width="400" height="400"></canvas>
     <button id="manipulateButton">Grayscale & Resize</button>
+    <button id="replaceButton">Replace Region</button>
     <button id="saveButton" disabled>Save File</button>
 
     <script>
+        // Variables to store the selected region and replacement image
+        let selectedRegion = null;
+        let replacementImage = null;
+
         // Function to manipulate the image (in this case, grayscale)
         function grayscaleImage(context, width, height) {
             const imageData = context.getImageData(0, 0, width, height);
@@ -47,6 +53,15 @@
             context.drawImage(canvas, 0, 0, newWidth, newHeight);
         }
 
+        // Function to replace a selected region with the replacement image
+        function replaceRegion(context, selectedRegion, replacementImage) {
+            if (!selectedRegion || !replacementImage) {
+                return;
+            }
+
+            context.drawImage(replacementImage, selectedRegion.x, selectedRegion.y, selectedRegion.width, selectedRegion.height);
+        }
+
         // Handle image upload and manipulation
         document.getElementById('imageInput').addEventListener('change', function (event) {
             const canvas = document.getElementById('canvas');
@@ -63,6 +78,17 @@
             image.src = URL.createObjectURL(event.target.files[0]);
         });
 
+        // Handle replacement image upload
+        document.getElementById('replacementInput').addEventListener('change', function (event) {
+            const image = new Image();
+
+            image.onload = function () {
+                replacementImage = image;
+            };
+
+            image.src = URL.createObjectURL(event.target.files[0]);
+        });
+
         // Handle manipulation button click
         document.getElementById('manipulateButton').addEventListener('click', function () {
             const canvas = document.getElementById('canvas');
@@ -72,6 +98,21 @@
 
             grayscaleImage(context, width, height);
             resizeImage(context, width, height, 2/3);
+        });
+
+        // Handle replace button click
+        document.getElementById('replaceButton').addEventListener('click', function () {
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+
+            const x = parseInt(prompt('Enter X-coordinate of the region to replace', '0'));
+            const y = parseInt(prompt('Enter Y-coordinate of the region to replace', '0'));
+            const width = parseInt(prompt('Enter width of the region to replace', '100'));
+            const height = parseInt(prompt('Enter height of the region to replace', '100'));
+
+            selectedRegion = { x, y, width, height };
+
+            replaceRegion(context, selectedRegion, replacementImage);
         });
 
         // Handle save button click
