@@ -2,14 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Image Manipulation</title>
-    <script src="https://cdn.jsdelivr.net/npm/bmp-js@0.0.1/bmp.js"></script>
+    <title>Image Replacement</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/save-pixels/0.5.2/save-pixels.min.js"></script>
 </head>
 <body>
     <input type="file" id="imageInput" accept="image/*">
     <input type="file" id="replacementInput" accept="image/*">
     <canvas id="canvas" width="400" height="400"></canvas>
-    <button id="manipulateButton">Grayscale & Resize</button>
     <button id="replaceButton">Replace Region</button>
     <button id="saveButton" disabled>Save as BMP</button>
 
@@ -17,42 +16,6 @@
         // Variables to store the selected region and replacement image
         let selectedRegion = null;
         let replacementImage = null;
-
-        // Function to manipulate the image (in this case, grayscale)
-        function grayscaleImage(context, width, height) {
-            const imageData = context.getImageData(0, 0, width, height);
-            const data = imageData.data;
-
-            for (let i = 0; i < data.length; i += 4) {
-                const red = data[i];
-                const green = data[i + 1];
-                const blue = data[i + 2];
-
-                // Convert the pixel to grayscale
-                const grayscale = 0.299 * red + 0.587 * green + 0.114 * blue;
-
-                data[i] = data[i + 1] = data[i + 2] = grayscale;
-            }
-
-            context.putImageData(imageData, 0, 0);
-        }
-
-        // Function to resize the image to 2/3 of its original size
-        function resizeImage(context, width, height, scaleFactor) {
-            const canvas = document.createElement('canvas');
-            const newWidth = width * scaleFactor;
-            const newHeight = height * scaleFactor;
-
-            canvas.width = newWidth;
-            canvas.height = newHeight;
-
-            const newContext = canvas.getContext('2d');
-            newContext.drawImage(context.canvas, 0, 0, width, height, 0, 0, newWidth, newHeight);
-
-            context.canvas.width = newWidth;
-            context.canvas.height = newHeight;
-            context.drawImage(canvas, 0, 0, newWidth, newHeight);
-        }
 
         // Function to replace a selected region with the replacement image
         function replaceRegion(context, selectedRegion, replacementImage) {
@@ -63,7 +26,7 @@
             context.drawImage(replacementImage, selectedRegion.x, selectedRegion.y, selectedRegion.width, selectedRegion.height);
         }
 
-        // Handle image upload and manipulation
+        // Handle image upload
         document.getElementById('imageInput').addEventListener('change', function (event) {
             const canvas = document.getElementById('canvas');
             const context = canvas.getContext('2d');
@@ -90,17 +53,6 @@
             image.src = URL.createObjectURL(event.target.files[0]);
         });
 
-        // Handle manipulation button click
-        document.getElementById('manipulateButton').addEventListener('click', function () {
-            const canvas = document.getElementById('canvas');
-            const context = canvas.getContext('2d');
-            const width = canvas.width;
-            const height = canvas.height;
-
-            grayscaleImage(context, width, height);
-            resizeImage(context, width, height, 2/3);
-        });
-
         // Handle replace button click
         document.getElementById('replaceButton').addEventListener('click', function () {
             const canvas = document.getElementById('canvas');
@@ -121,9 +73,17 @@
             const canvas = document.getElementById('canvas');
             const context = canvas.getContext('2d');
 
-            // Convert the canvas to BMP format
-            const bmpData = BMP.encode(context.getImageData(0, 0, canvas.width, canvas.height));
-            const blob = new Blob([bmpData.buffer], { type: 'image/bmp' });
+            // Create a new ImageData from the canvas
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+            // Convert the ImageData to BMP format using save-pixels
+            const bmpData = new Uint8Array(canvas.width * canvas.height * 3); // 3 bytes per pixel
+            const result = new Uint8Array(canvas.width * canvas.height * 3);
+            const out = { shape: [canvas.width, canvas.height, 3], data: bmpData };
+            const pixels = { shape: [canvas.width, canvas.height, 4], data: imageData.data };
+            savePixels(pixels, 'bmp').pipe(out);
+
+            const blob = new Blob([result], { type: 'image/bmp' });
             const url = URL.createObjectURL(blob);
 
             const link = document.createElement('a');
