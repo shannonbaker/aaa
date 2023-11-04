@@ -7,7 +7,7 @@
 <body>
     <input type="file" id="imageInput" accept="image/*">
     <canvas id="canvas" width="400" height="400"></canvas>
-    <button id="manipulateButton">Grayscale</button>
+    <button id="manipulateButton">Grayscale & Resize</button>
 
     <script>
         // Function to manipulate the image (in this case, grayscale)
@@ -27,6 +27,23 @@
             }
 
             context.putImageData(imageData, 0, 0);
+        }
+
+        // Function to resize the image to 2/3 of its original size
+        function resizeImage(context, width, height, scaleFactor) {
+            const canvas = document.createElement('canvas');
+            const newWidth = width * scaleFactor;
+            const newHeight = height * scaleFactor;
+
+            canvas.width = newWidth;
+            canvas.height = newHeight;
+
+            const newContext = canvas.getContext('2d');
+            newContext.drawImage(context.canvas, 0, 0, width, height, 0, 0, newWidth, newHeight);
+
+            context.canvas.width = newWidth;
+            context.canvas.height = newHeight;
+            context.drawImage(canvas, 0, 0, newWidth, newHeight);
         }
 
         // Handle image upload and manipulation
@@ -52,6 +69,7 @@
             const height = canvas.height;
 
             grayscaleImage(context, width, height);
+            resizeImage(context, width, height, 2/3);
         });
     </script>
 </body>
