@@ -8,6 +8,7 @@
     <input type="file" id="imageInput" accept="image/*">
     <canvas id="canvas" width="400" height="400"></canvas>
     <button id="manipulateButton">Grayscale & Resize</button>
+    <button id="saveButton" disabled>Save File</button>
 
     <script>
         // Function to manipulate the image (in this case, grayscale)
@@ -56,6 +57,7 @@
                 canvas.width = image.width;
                 canvas.height = image.height;
                 context.drawImage(image, 0, 0);
+                document.getElementById('saveButton').disabled = false;
             };
 
             image.src = URL.createObjectURL(event.target.files[0]);
@@ -70,6 +72,17 @@
 
             grayscaleImage(context, width, height);
             resizeImage(context, width, height, 2/3);
+        });
+
+        // Handle save button click
+        document.getElementById('saveButton').addEventListener('click', function () {
+            const canvas = document.getElementById('canvas');
+            canvas.toBlob(function (blob) {
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'altered_image.png';
+                link.click();
+            });
         });
     </script>
 </body>
