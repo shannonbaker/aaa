@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Image Manipulation</title>
+    <script src="https://cdn.jsdelivr.net/npm/bmp-js@0.0.1/bmp.js"></script>
 </head>
 <body>
     <input type="file" id="imageInput" accept="image/*">
@@ -10,7 +11,7 @@
     <canvas id="canvas" width="400" height="400"></canvas>
     <button id="manipulateButton">Grayscale & Resize</button>
     <button id="replaceButton">Replace Region</button>
-    <button id="saveButton" disabled>Save File</button>
+    <button id="saveButton" disabled>Save as BMP</button>
 
     <script>
         // Variables to store the selected region and replacement image
@@ -118,12 +119,17 @@
         // Handle save button click
         document.getElementById('saveButton').addEventListener('click', function () {
             const canvas = document.getElementById('canvas');
-            canvas.toBlob(function (blob) {
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = 'altered_image.png';
-                link.click();
-            });
+            const context = canvas.getContext('2d');
+
+            // Convert the canvas to BMP format
+            const bmpData = BMP.encode(context.getImageData(0, 0, canvas.width, canvas.height));
+            const blob = new Blob([bmpData.buffer], { type: 'image/bmp' });
+            const url = URL.createObjectURL(blob);
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'altered_image.bmp';
+            link.click();
         });
     </script>
 </body>
